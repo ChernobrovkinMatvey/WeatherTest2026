@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/Элементы решения/">
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="Weather.Application/Weather.Application.csproj" />
+  <Project Path="Weather.Domain/Weather.Domain.csproj" />
+  <Project Path="Weather.Infrastructure/Weather.Infrastructure.csproj" />
+  <Project Path="Weather.UnitTest/Weather.UnitTest.csproj" />
+  <Project Path="WeatherUi/WeatherUi.csproj" Id="6e69dac0-b005-4557-8981-a052de93c021" />
+</Solution>
