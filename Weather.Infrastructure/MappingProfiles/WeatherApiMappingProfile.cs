@@ -5,7 +5,7 @@ using Weather.Domain.Models;
 namespace Weather.Infrastructure.MappingProfiles;
 
 /// <summary>
-/// Профиль маппинга сырых ответов WeatherAPI (RawResponse) в модели приложения.
+/// Профиль маппинга сырых ответов WeatherAPI (RawResponse) в модели приложения
 /// </summary>
 public class WeatherApiMappingProfile : Profile
 {
@@ -23,8 +23,8 @@ public class WeatherApiMappingProfile : Profile
         CreateMap<ConditionRawResponse, WeatherCondition>();
 
         CreateMap<ForecastDayRawResponse, ForecastDay>()
-            .ForMember(d => d.MaxtempC, o => o.MapFrom(s => s.Day == null ? 0 : s.Day.MaxtempC))
-            .ForMember(d => d.MintempC, o => o.MapFrom(s => s.Day == null ? 0 : s.Day.MintempC))
+            .ForMember(d => d.AvgtempC, o => o.MapFrom(s => s.Day == null ? 0 : s.Day.AvgtempC))
+            .ForMember(d => d.MaxWindKph, o => o.MapFrom(s => s.Day == null ? 0 : s.Day.MaxWindKph))
             .ForMember(d => d.Condition, o => o.MapFrom(s => s.Day == null ? null : s.Day.Condition))
             .ForMember(d => d.Sunrise, o => o.MapFrom(s => s.Astro == null ? "" : s.Astro.Sunrise))
             .ForMember(d => d.Sunset, o => o.MapFrom(s => s.Astro == null ? "" : s.Astro.Sunset))

@@ -1,0 +1,30 @@
+@using System.Globalization
+
+<div class="hourly-forecast w-100">
+    <div class="row g-4">
+        @foreach (var hour in Hours)
+        {
+            <div class="col-2 text-center py-2 border-bottom">
+                <div class="small text-muted">@FormatTime(hour.Time)</div>
+                @if (hour.Condition is { } condition)
+                {
+                    <img src="@condition.Icon" alt="@condition.Text" title="@condition.Text" style="width:32px;height:32px" />
+                }
+                <div class="fw-bold">@hour.TempC.ToString("F0", CultureInfo.InvariantCulture)°</div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public ICollection<HourContract> Hours { get; set; } = [];
+
+    private static string FormatTime(string time)
+    {
+        if (DateTime.TryParse(time, out var dt))
+            return dt.ToString("HH:mm", CultureInfo.InvariantCulture);
+        
+        return time;
+    }
+}

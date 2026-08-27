@@ -1,7 +1,7 @@
 namespace Weather.Domain.Models;
 
 /// <summary>
-/// Погодное условие: текстовое описание и иконка.
+/// Погодное условие: текстовое описание и иконка
 /// </summary>
 public class WeatherCondition
 {

@@ -1,0 +1,86 @@
+﻿@using System.Globalization
+@using WeatherUi.Components.Shared
+
+<div class="card w-100@(Stretch ? " h-100" : "")">
+    <div class="card-body">
+        <h5 class="card-title">
+            @Forecast.City, @Forecast.Country
+            <small class="text-muted ms-2 fw-normal">@DateFormatter.ToLocalDateFormat(Forecast.LocalTime)</small>
+        </h5>
+
+        @if (Forecast.Current is { } current)
+        {
+            <div class="row g-3">
+                <div class="col-md-auto text-center">
+                    @if (current.Condition is { } condition)
+                    {
+                        <img src="@condition.Icon" alt="@condition.Text"/>
+                        <div>@condition.Text</div>
+                    }
+                </div>
+                <div class="col">
+                    <table class="table table-sm table-borderless mb-0">
+                        <tbody>
+                        <tr>
+                            <td class="text-muted">Температура</td>
+                            <td><strong>@current.TempC.ToString("F1", CultureInfo.InvariantCulture) °C</strong></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Ощущается как</td>
+                            <td>@current.FeelsLikeC.ToString("F1", CultureInfo.InvariantCulture) °C</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Влажность</td>
+                            <td>@current.Humidity %</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Ветер</td>
+                            <td title='@current.WindKph.ToString("F1", CultureInfo.InvariantCulture) км/ч'>@current.WindMps.ToString("F1", CultureInfo.InvariantCulture) м/с</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div class="text-muted small mt-4 border-top pt-2">
+                        Обновлено: @DateFormatter.ToLocalDateFormat(current.LastUpdated)
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="card-footer text-center">
+    @if (HourlyMode == ShowHourlyMode.Current)
+    {
+        <a href="#" class="btn btn-sm btn-outline-secondary" @onclick="HideHourlyAsync" @onclick:preventDefault>Скрыть почасовой прогноз</a>
+    }
+    else
+    {
+        <a href="#" class="btn btn-sm btn-outline-secondary" @onclick="ShowHourlyAsync" @onclick:preventDefault>Показать почасовой прогноз</a>
+    }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public WeatherForecastContract Forecast { get; set; } = null!;
+
+    [Parameter]
+    public bool Stretch { get; set; }
+
+    [Parameter]
+    public ShowHourlyMode? HourlyMode { get; set; }
+
+    [Parameter]
+    public EventCallback<(ShowHourlyMode? Mode, string Date)> OnShowHourly { get; set; }
+
+    private async Task ShowHourlyAsync(MouseEventArgs e)
+    {
+        var firstDay = Forecast.Forecastdays?.FirstOrDefault();
+        await OnShowHourly.InvokeAsync((ShowHourlyMode.Current, firstDay?.Date ?? string.Empty));
+        //StateHasChanged();
+    }
+
+    private async Task HideHourlyAsync(MouseEventArgs e)
+    {
+        await OnShowHourly.InvokeAsync((null, string.Empty));
+        //StateHasChanged();
+    }
+}

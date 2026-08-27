@@ -1,0 +1,8 @@
+﻿services:
+  weatherui:
+    image: weatherui
+    build:
+      context: .
+      dockerfile: WeatherUi/Dockerfile
+    ports:
+      - "5080:8080"

@@ -1,6 +1,36 @@
-﻿<Router AppAssembly="typeof(Program).Assembly" NotFoundPage="typeof(Pages.NotFound)">
-    <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
-        <FocusOnNavigate RouteData="routeData" Selector="h1" />
-    </Found>
-</Router>
+﻿@inject IWebHostEnvironment Environment
+
+<ErrorBoundary @ref="_errorBoundary">
+    <ChildContent>
+        <Router AppAssembly="typeof(Program).Assembly" NotFoundPage="typeof(Pages.NotFound)">
+            <Found Context="routeData">
+                <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+                <FocusOnNavigate RouteData="routeData" Selector="h1" />
+            </Found>
+        </Router>
+    </ChildContent>
+    <ErrorContent>
+        @{
+            var ex = @context;
+        }
+        <div class="alert alert-danger text-center m-5" role="alert">
+            <h4 class="alert-heading">Что-то пошло не так</h4>
+            <p class="fw-bold">@ex.GetType().Name: @ex.Message</p>
+            @if (Environment.IsDevelopment() && ex.InnerException != null)
+            {
+                <p class="text-warning">Inner: @ex.InnerException.GetType().Name: @ex.InnerException.Message</p>
+            }
+            @if (Environment.IsDevelopment())
+            {
+                <pre class="bg-light p-2 rounded text-start small" style="white-space: pre-wrap;">@ex.StackTrace</pre>
+            }
+            <button class="btn btn-danger mt-3" @onclick="Recover">Перезагрузить</button>
+        </div>
+    </ErrorContent>
+</ErrorBoundary>
+
+@code {
+    private ErrorBoundary? _errorBoundary;
+
+    private void Recover() => _errorBoundary?.Recover();
+}

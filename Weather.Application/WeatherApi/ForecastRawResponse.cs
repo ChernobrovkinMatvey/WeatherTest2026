@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace Weather.Application.WeatherApi;
 
 /// <summary>
-/// Контейнер прогноза с массивом дней из ответа WeatherAPI.
+/// Контейнер прогноза с массивом дней из ответа WeatherAPI
 /// </summary>
 public class ForecastRawResponse
 {

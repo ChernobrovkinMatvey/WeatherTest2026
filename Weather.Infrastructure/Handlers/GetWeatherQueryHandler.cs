@@ -7,6 +7,9 @@ using Weather.Domain.Models;
 
 namespace Weather.Infrastructure.Handlers;
 
+/// <summary>
+/// Получает данные о погоде через внешний API <see cref="GetWeatherQuery"/>
+/// </summary>
 public class GetWeatherQueryHandler : IRequestHandler<GetWeatherQuery, WeatherResponse>
 {
     private readonly IWeatherService _weatherService;
@@ -25,6 +28,9 @@ public class GetWeatherQueryHandler : IRequestHandler<GetWeatherQuery, WeatherRe
         _validator = validator;
     }
 
+    /// <summary>
+    /// Валидирует запрос, получает данные от сервиса погоды и маппит их в <see cref="WeatherResponse"/>
+    /// </summary>
     public async Task<WeatherResponse> Handle(GetWeatherQuery request, CancellationToken cancellationToken)
     {
         await _validator.ValidateAndThrowAsync(request, cancellationToken);

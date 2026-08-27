@@ -4,7 +4,7 @@ using Weather.Domain.Models;
 namespace Weather.Application.Queries;
 
 /// <summary>
-/// CQRS-запрос на получение погоды для указанных координат.
+/// CQRS-запрос на получение погоды для указанных координат
 /// </summary>
 public class GetWeatherQuery : IRequest<WeatherResponse>
 {

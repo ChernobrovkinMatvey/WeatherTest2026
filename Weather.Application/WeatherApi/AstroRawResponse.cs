@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace Weather.Application.WeatherApi;
 
 /// <summary>
-/// Астрономические данные из ответа WeatherAPI (восход, закат).
+/// Астрономические данные из ответа WeatherAPI (восход, закат)
 /// </summary>
 public class AstroRawResponse
 {

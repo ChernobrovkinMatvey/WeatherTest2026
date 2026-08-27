@@ -1,7 +1,7 @@
 namespace Weather.Application.Contracts;
 
 /// <summary>
-/// Контракт текущих погодных условий для внешнего API.
+/// Контракт текущих погодных условий для внешнего API
 /// </summary>
 public class CurrentWeatherContract
 {
@@ -16,6 +16,9 @@ public class CurrentWeatherContract
 
     /// <summary>Скорость ветра в км/ч.</summary>
     public double WindKph { get; set; }
+
+    /// <summary>Скорость ветра в м/с.</summary>
+    public double WindMps { get; set; }
 
     /// <summary>УФ-индекс.</summary>
     public double Uv { get; set; }

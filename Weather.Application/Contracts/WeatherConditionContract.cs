@@ -1,7 +1,7 @@
 namespace Weather.Application.Contracts;
 
 /// <summary>
-/// Контракт погодного условия для внешнего API.
+/// Контракт погодного условия для внешнего API
 /// </summary>
 public class WeatherConditionContract
 {

@@ -19,7 +19,7 @@ public class Program
         builder.Services.AddHttpClient();
 
         builder.Services.AddMappingProfiles();
-        builder.Services.AddServices();
+        builder.Services.AddInfrastructureServices();
         builder.Services.AddValidators();
         builder.Services.AddHandlers();
 
@@ -27,7 +27,6 @@ public class Program
 
         if (!app.Environment.IsDevelopment())
         {
-            app.UseExceptionHandler("/Error", createScopeForErrors: true);
             app.UseHsts();
         }
 

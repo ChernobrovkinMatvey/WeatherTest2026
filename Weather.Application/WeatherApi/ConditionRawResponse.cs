@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace Weather.Application.WeatherApi;
 
 /// <summary>
-/// Погодное условие из ответа WeatherAPI (текст, иконка, код).
+/// Погодное условие из ответа WeatherAPI (текст, иконка, код)
 /// </summary>
 public class ConditionRawResponse
 {

@@ -1,8 +1,10 @@
 using AutoMapper;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
 using Weather.Application.Services;
-using Weather.Infrastructure.Implementation;
+using Weather.Domain.Entities;
+using Weather.Infrastructure.Implementations;
 
 namespace Weather.Infrastructure;
 
@@ -11,14 +13,14 @@ public static class DependencyInjection
     extension(IServiceCollection services)
     {
         /// <summary>
-        /// Регистрирует в DI все профили AutoMapper из сборки Weather.Infrastructure.
+        /// Регистрирует в DI все профили AutoMapper из сборки Weather.Infrastructure
         /// </summary>
         public IServiceCollection AddMappingProfiles()
         {
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.AddMaps(typeof(DependencyInjection).Assembly);
-            }, null);
+            }, NullLoggerFactory.Instance);
 
             services.AddSingleton<IMapper>(config.CreateMapper());
 
@@ -26,17 +28,18 @@ public static class DependencyInjection
         }
 
         /// <summary>
-        /// Регистрирует сервисы приложения.
+        /// Регистрирует сервисы приложения
         /// </summary>
-        public IServiceCollection AddServices()
+        public IServiceCollection AddInfrastructureServices()
         {
             services.AddScoped<IWeatherService, WeatherService>();
+            services.AddSingleton<IReadRepository<CityOfSubject>, CityOfSubjectRepository>();
 
             return services;
         }
 
         /// <summary>
-        /// Регистрирует все FluentValidation-валидаторы из сборки Weather.Infrastructure.
+        /// Регистрирует все FluentValidation-валидаторы из сборки Weather.Infrastructure
         /// </summary>
         public IServiceCollection AddValidators()
         {
@@ -46,7 +49,7 @@ public static class DependencyInjection
         }
 
         /// <summary>
-        /// Регистрирует все MediatR-обработчики из сборки Weather.Infrastructure.
+        /// Регистрирует все MediatR-обработчики из сборки Weather.Infrastructure
         /// </summary>
         public IServiceCollection AddHandlers()
         {

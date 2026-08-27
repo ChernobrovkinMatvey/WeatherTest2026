@@ -1,0 +1,77 @@
+﻿@using System.Globalization
+@using WeatherUi.Components.Shared
+
+<div class="card w-100 h-100">
+    <div class="card-body">
+        <h5 class="card-title">
+            @DateFormatter.ToDateOnly(ForecastDay.Date)
+        </h5>
+
+        @if (ForecastDay.Condition is { } condition)
+        {
+            <div class="text-center mb-2">
+                <img src="@condition.Icon" alt="@condition.Text" />
+                <div>@condition.Text</div>
+            </div>
+        }
+
+        <table class="table table-sm table-borderless mb-0">
+            <tbody>
+            <tr>
+                <td class="text-muted">Средняя температура</td>
+                <td><strong>@ForecastDay.AvgtempC.ToString("F1", CultureInfo.InvariantCulture) °C</strong></td>
+            </tr>
+            <tr>
+                <td class="text-muted">Макс. ветер</td>
+                <td title='@ForecastDay.MaxWindKph.ToString("F1", CultureInfo.InvariantCulture) км/ч'>@ForecastDay.MaxWindMps.ToString("F1", CultureInfo.InvariantCulture) м/с</td>
+            </tr>
+            <tr>
+                <td class="text-muted">Восход / Закат</td>
+                <td>@DateFormatter.StripAmPm(ForecastDay.Sunrise) / @DateFormatter.StripAmPm(ForecastDay.Sunset)</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer text-center">
+    @if (HourlyMode == ShowHourlyMode.OtherDay && HourlyDate == ForecastDay.Date)
+    {
+        <a href="#" class="btn btn-sm btn-outline-secondary" @onclick="HideHourlyAsync" @onclick:preventDefault>Скрыть почасовой прогноз</a>
+    }
+    else
+    {
+        <a href="#" class="btn btn-sm btn-outline-secondary" @onclick="ShowHourlyAsync" @onclick:preventDefault>Показать почасовой прогноз</a>
+    }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public ForecastDayContract ForecastDay { get; set; } = null!;
+
+    [Parameter]
+    public ShowHourlyMode? HourlyMode { get; set; }
+
+    [Parameter] 
+    public string HourlyDate { get; set; } = "";
+
+    [Parameter]
+    public EventCallback<(ShowHourlyMode? Mode, string Date)> OnShowHourly { get; set; }
+
+    // private async Task RunOnShowHourly((ShowHourlyMode? Mode, string Date) args)
+    // {
+    //     HourlyMode = args.Mode;
+    //     HourlyDate = args.Date;
+    //     StateHasChanged();
+    //     await OnShowHourly.InvokeAsync(args);
+    // }
+
+    private async Task ShowHourlyAsync(MouseEventArgs e)
+    {
+        await OnShowHourly.InvokeAsync((ShowHourlyMode.OtherDay, ForecastDay.Date));
+    }
+
+    private async Task HideHourlyAsync(MouseEventArgs e)
+    {
+        await OnShowHourly.InvokeAsync((null, string.Empty));
+    }
+}

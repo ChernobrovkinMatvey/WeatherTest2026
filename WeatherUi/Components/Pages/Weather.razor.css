@@ -1,0 +1,13 @@
+.city-select {
+    min-width: 250px;
+}
+
+.spinner-large {
+    width: 4rem;
+    height: 4rem;
+}
+
+.forecast-card {
+    width: 470px;
+    flex: 0 0 auto;
+}

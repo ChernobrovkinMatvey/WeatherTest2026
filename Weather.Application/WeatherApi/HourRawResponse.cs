@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace Weather.Application.WeatherApi;
 
 /// <summary>
-/// Почасовой прогноз из ответа WeatherAPI.
+/// Почасовой прогноз из ответа WeatherAPI
 /// </summary>
 public class HourRawResponse
 {

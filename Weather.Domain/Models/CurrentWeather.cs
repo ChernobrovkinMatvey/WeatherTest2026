@@ -1,7 +1,7 @@
 namespace Weather.Domain.Models;
 
 /// <summary>
-/// Текущие погодные условия.
+/// Текущие погодные условия
 /// </summary>
 public class CurrentWeather
 {

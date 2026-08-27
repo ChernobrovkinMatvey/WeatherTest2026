@@ -1,63 +1,301 @@
 ﻿@page "/weather"
+@using global::Weather.Domain.Models
+@inject IMediator Mediator
+@inject IMapper Mapper
 
-<PageTitle>Weather</PageTitle>
+<PageTitle>Погода</PageTitle>
 
-<h1>Weather</h1>
+<h1>Погода</h1>
 
-<p>This component demonstrates showing data.</p>
-
-@if (forecasts == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th aria-label="Temperature in Celsius">Temp. (C)</th>
-                <th aria-label="Temperature in Fahrenheit">Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in forecasts)
+<div class="d-flex justify-content-between align-items-center py-3 mb-3 gap-3">
+    <div class="d-flex align-items-center gap-2">
+        <label for="citySelect" class="form-label mb-0">Город:</label>
+        <select id="citySelect" class="form-select city-select" value="@(_selectedCityOfSubjectContract?.Id)" @onchange="OnCityChanged">
+            @foreach (var city in _cityOfSubjectContracts)
             {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
+                <option value="@city.Id">@city.City (@city.Subject)</option>
             }
-        </tbody>
-    </table>
+        </select>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+        <input type="radio" class="btn-check" name="forecastMode" id="forecastToday"
+               checked="@(_forecastMode == ForecastMode.Today)"
+               @onchange="() => SetForecastMode(ForecastMode.Today)" autocomplete="off" />
+        <label class="btn btn-outline-primary" for="forecastToday">Сегодня</label>
+        <input type="radio" class="btn-check" name="forecastMode" id="forecastThreeDays"
+               checked="@(_forecastMode == ForecastMode.ThreeDays)"
+               @onchange="() => SetForecastMode(ForecastMode.ThreeDays)" autocomplete="off" />
+        <label class="btn btn-outline-primary" for="forecastThreeDays">За 3 дня</label>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(_errorMessage))
+{
+    <div class="alert alert-danger d-flex justify-content-between align-items-center mt-3" role="alert">
+        <span>@_errorMessage</span>
+        <button class="btn btn-outline-danger btn-sm" @onclick="ReloadData">Повторить</button>
+    </div>
+}
+
+@if (_isLoading)
+{
+    <div class="splash-loader">
+        <div class="spinner-border text-primary spinner-large" role="status">
+            <span class="visually-hidden">Загрузка...</span>
+        </div>
+    </div>
+}
+
+@if (_weatherForecastContract != null)
+{
+    @if (_forecastMode == ForecastMode.ThreeDays)
+    {
+        <div class="row justify-content-center g-3">
+            <div class="d-flex forecast-card">
+                <CurrentForecast Forecast="_weatherForecastContract" Stretch="true" HourlyMode="@_hourlyMode" OnShowHourly="SetHourlyMode" />
+            </div>
+            @if (_weatherForecastContract.Forecastdays is { } days)
+            {
+                @foreach (var day in days.Skip(1))
+                {
+                    <div class="d-flex forecast-card">
+                        <ForecastDayCard ForecastDay="day" HourlyMode="@_hourlyMode"  HourlyDate="@_hourlyDate" OnShowHourly="SetHourlyMode" />
+                    </div>
+                }
+            }
+        </div>
+    }
+    else
+    {
+        <div class="d-flex justify-content-center">
+            <div class="d-flex forecast-card">
+                <CurrentForecast Forecast="_weatherForecastContract" HourlyMode="@_hourlyMode" OnShowHourly="SetHourlyMode" />
+            </div>
+        </div>
+    }
+}
+
+@if (_weatherForecastContract != null && _hourlyMode != null)
+{
+    <div class="row justify-content-center mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        @{
+                            var title = _hourlyMode switch
+                            {
+                                ShowHourlyMode.Current => "Почасовой прогноз на сегодня и завтра",
+                                ShowHourlyMode.OtherDay => $"Почасовой прогноз на {_hourlyDate}",
+                                _ => "Почасовой прогноз"
+                            };
+                        }
+                        @title
+                    </h5>
+                    <HourlyForecast Hours="GetHourlyContracts()" />
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
 @code {
-    private WeatherForecast[]? forecasts;
-
-    protected override async Task OnInitializedAsync()
+    private enum ForecastMode
     {
-        // Simulate asynchronous loading to demonstrate a loading indicator
-        await Task.Delay(500);
-
-        var startDate = DateOnly.FromDateTime(DateTime.Now);
-        var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
-        forecasts = Enumerable.Range(1, 5).Select(index => new WeatherForecast
-        {
-            Date = startDate.AddDays(index),
-            TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = summaries[Random.Shared.Next(summaries.Length)]
-        }).ToArray();
+        /// <summary>
+        /// Сегодня
+        /// </summary>
+        Today,
+        /// <summary>
+        /// Три дня
+        /// </summary>
+        ThreeDays
     }
 
-    private class WeatherForecast
+    /// <summary>
+    /// Режим отображения прогноза
+    /// </summary>
+    private ForecastMode _forecastMode = ForecastMode.Today;
+
+    /// <summary>
+    /// Смена режима отображения прогноза
+    /// </summary>
+    private async Task SetForecastMode(ForecastMode mode)
     {
-        public DateOnly Date { get; set; }
-        public int TemperatureC { get; set; }
-        public string? Summary { get; set; }
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+        if (_forecastMode == mode)
+            return;
+        _forecastMode = mode;
+        StateHasChanged();
+    }
+
+
+    /// <summary>
+    /// Список городов субъектов РФ
+    /// </summary>
+    private ICollection<CityOfSubjectContract> _cityOfSubjectContracts = [];
+
+    /// <summary>
+    /// Получаем список городов субъектов РФ
+    /// </summary>
+    /// <returns></returns>
+    async Task<ICollection<CityOfSubjectContract>> GetCityOfSubjectRecords()
+    {
+        var cityOfSubjectRecs = await Mediator.Send(new GetCityOfSubjectQuery());
+
+        return Mapper.Map<ICollection<CityOfSubjectContract>>(cityOfSubjectRecs.OrderBy(t => t.City));
+    }
+    
+    /// <summary>
+    /// Выбранный город-субъект РФ
+    /// </summary>
+    private CityOfSubjectContract? _selectedCityOfSubjectContract;
+
+    
+    /// <summary>
+    /// Сообщение об ошибке при загрузке прогноза погоды
+    /// </summary>
+    private string? _errorMessage;
+
+    /// <summary>
+    /// Флаг загрузки данных
+    /// </summary>
+    private bool _isLoading;
+
+    /// <summary>
+    /// Загрузка прогноза погоды
+    /// </summary>
+    private async Task ReloadData()
+    {
+        _weatherForecastContract = null;
+        if (_selectedCityOfSubjectContract == null)
+            return;
+        
+        _isLoading = true;
+        _errorMessage = null;
+        _hourlyMode = null;
+        StateHasChanged();
+        WeatherResponse weatherResponse = null;
+        //await Task.Delay(5 * 1000);
+        
+        try
+        {
+            var query = new GetWeatherQuery
+            {
+                Lat = _selectedCityOfSubjectContract.Lat,
+                Lon = _selectedCityOfSubjectContract.Lon,
+                Days = 3
+            };
+            weatherResponse = await Mediator.Send(query);
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Не удалось загрузить данные: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+
+        _weatherForecastContract = Mapper.Map<WeatherForecastContract>(weatherResponse);
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Ответ с прогнозом погоды
+    /// </summary>
+    private WeatherForecastContract? _weatherForecastContract;
+    
+
+    /// <summary>
+    /// При первой отрисовке загружаем список городов и прогноз для Москвы (или первого города в списке)
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        _cityOfSubjectContracts = await GetCityOfSubjectRecords();
+        _selectedCityOfSubjectContract = _cityOfSubjectContracts.FirstOrDefault(t => string.Compare(t.City, "Москва", StringComparison.CurrentCultureIgnoreCase) == 0)
+                                        ?? _cityOfSubjectContracts.FirstOrDefault();
+
+        await ReloadData();
+    }
+
+    
+    /// <summary>
+    /// Обработчик смены города в выпадающем списке
+    /// </summary>
+    private async Task OnCityChanged(ChangeEventArgs e)
+    {
+        var cityId = e.Value?.ToString();
+        if (cityId == null) return;
+
+        _selectedCityOfSubjectContract = _cityOfSubjectContracts.FirstOrDefault(c => c.Id == cityId);
+        await ReloadData();
+    }
+    
+    
+    /// <summary>
+    /// Режим отображения почасового прогноза
+    /// </summary>
+    private ShowHourlyMode? _hourlyMode = null;
+
+    /// <summary>
+    /// Дата для отображения часового прогноза
+    /// </summary>
+    private string _hourlyDate = string.Empty;
+
+    /// <summary>
+    /// Метод смены параметров почасового прогноза
+    /// </summary>
+    /// <param name="args"></param>
+    private void SetHourlyMode((ShowHourlyMode? Mode, string Date) args)
+    {
+        _hourlyMode = args.Mode;
+        _hourlyDate = args.Date;
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Возвращает коллекцию часовых прогнозов для отображения в компоненте <see cref="HourlyForecast"/>.
+    /// В режиме <see cref="ShowHourlyMode.Current"/> — оставшиеся часы сегодня + все часы завтра.
+    /// В режиме <see cref="ShowHourlyMode.OtherDay"/> — часы для выбранной даты <see cref="_hourlyDate"/>.
+    /// </summary>
+    private ICollection<HourContract> GetHourlyContracts()
+    {
+        if (_hourlyMode == null || _weatherForecastContract?.Forecastdays is not { } days)
+            return [];
+
+        if (_hourlyMode == ShowHourlyMode.Current)
+        {
+            var today = days.FirstOrDefault();
+            if (today?.Hours is not { } todayHours)
+                return [];
+
+            var localTime = DateTime.TryParse(_weatherForecastContract.LocalTime, out var lt) ? lt : (DateTime?)null;
+
+            if (localTime == null)
+                return todayHours;
+
+            var parsedTodayHours = todayHours
+                .Select(h => (Contract: h, Time: DateTime.TryParse(h.Time, out var ht) ? ht : (DateTime?)null))
+                .Where(x => x.Time > localTime)
+                .Select(x => x.Contract)
+                .ToList();
+
+            var tomorrow = days.Skip(1).FirstOrDefault();
+            if (tomorrow?.Hours is { } tomorrowHours)
+                return [..parsedTodayHours, ..tomorrowHours];
+
+            return parsedTodayHours;
+        }
+
+        if (_hourlyMode == ShowHourlyMode.OtherDay)
+        {
+            var day = days.FirstOrDefault(d => d.Date == _hourlyDate);
+            return day?.Hours ?? [];
+        }
+
+        return [];
     }
 }

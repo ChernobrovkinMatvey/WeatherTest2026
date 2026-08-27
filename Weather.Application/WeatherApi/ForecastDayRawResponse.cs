@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace Weather.Application.WeatherApi;
 
 /// <summary>
-/// Прогноз на один день из ответа WeatherAPI (дата, день, астрономия, почасовка).
+/// Прогноз на один день из ответа WeatherAPI (дата, день, астрономия, почасовка)
 /// </summary>
 public class ForecastDayRawResponse
 {

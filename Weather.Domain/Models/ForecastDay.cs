@@ -1,18 +1,18 @@
 namespace Weather.Domain.Models;
 
 /// <summary>
-/// Прогноз погоды на один день.
+/// Прогноз погоды на один день
 /// </summary>
 public class ForecastDay
 {
     /// <summary>Дата прогноза в формате yyyy-MM-dd.</summary>
     public string Date { get; set; } = string.Empty;
 
-    /// <summary>Максимальная температура за день в градусах Цельсия.</summary>
-    public double MaxtempC { get; set; }
+    /// <summary>Средняя температура за день в градусах Цельсия.</summary>
+    public double AvgtempC { get; set; }
 
-    /// <summary>Минимальная температура за день в градусах Цельсия.</summary>
-    public double MintempC { get; set; }
+    /// <summary>Максимальная скорость ветра в км/ч.</summary>
+    public double MaxWindKph { get; set; }
 
     /// <summary>Погодное условие (текст, иконка).</summary>
     public WeatherCondition? Condition { get; set; }

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace Weather.Application.WeatherApi;
 
 /// <summary>
-/// Текущие погодные условия из ответа WeatherAPI.
+/// Текущие погодные условия из ответа WeatherAPI
 /// </summary>
 public class CurrentRawResponse
 {

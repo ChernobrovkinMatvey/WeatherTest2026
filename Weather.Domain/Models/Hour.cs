@@ -1,7 +1,7 @@
 namespace Weather.Domain.Models;
 
 /// <summary>
-/// Почасовой прогноз погоды.
+/// Почасовой прогноз погоды
 /// </summary>
 public class Hour
 {

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace Weather.Application.WeatherApi;
 
 /// <summary>
-/// Местоположение из ответа WeatherAPI.
+/// Местоположение из ответа WeatherAPI
 /// </summary>
 public class LocationRawResponse
 {
