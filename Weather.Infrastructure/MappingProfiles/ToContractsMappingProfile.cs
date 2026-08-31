@@ -1,5 +1,6 @@
 using AutoMapper;
 using Weather.Application.Contracts;
+using Weather.Application.DTOs;
 using Weather.Domain.Entities;
 using Weather.Domain.Models;
 
@@ -26,5 +27,7 @@ public class ToContractsMappingProfile : Profile
         
         CreateMap<CityOfSubject, CityOfSubjectContract>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToString()));
+
+        CreateMap<CityOfSubjectCreateContract, CityOfSubjectCreateDto>();
     }
 }

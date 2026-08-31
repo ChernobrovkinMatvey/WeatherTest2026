@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Weather.Application.Contracts;
 
 /// <summary>
@@ -8,25 +10,30 @@ public class CityOfSubjectContract
     /// <summary>
     /// Id записи
     /// </summary>
-    public string Id { get; set; }
-    
+    [Required]
+    public string Id { get; set; } = "";
+
     /// <summary>
     /// Субъект РФ
     /// </summary>
-    public string Subject { get; set; }
-    
+    [Required]
+    public string Subject { get; set; } = "";
+
     /// <summary>
     /// Административный центр
     /// </summary>
-    public string City { get; set; }
+    [Required]
+    public string City { get; set; } = "";
     
     /// <summary>
     /// Широта
     /// </summary>
+    [Required]
     public double Lat { get; set; }
     
     /// <summary>
     /// Долгота
     /// </summary>
+    [Required]
     public double Lon { get; set; }
 }

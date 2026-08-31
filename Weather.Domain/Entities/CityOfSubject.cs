@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Weather.Domain.Entities;
 
 /// <summary>
@@ -8,12 +10,14 @@ public class CityOfSubject : Entity
     /// <summary>
     /// Субъект РФ
     /// </summary>
-    public string Subject { get; set; }
-    
+    [Required]
+    public string Subject { get; set; } = "";
+
     /// <summary>
     /// Административный центр
     /// </summary>
-    public string City { get; set; }
+    [Required]
+    public string City { get; set; } = "";
     
     /// <summary>
     /// Широта

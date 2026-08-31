@@ -140,7 +140,7 @@
     /// <returns></returns>
     async Task<ICollection<CityOfSubjectContract>> GetCityOfSubjectRecords()
     {
-        var cityOfSubjectRecs = await Mediator.Send(new GetCityOfSubjectQuery());
+        var cityOfSubjectRecs = await Mediator.Send(new GetAllCityOfSubjectQuery());
 
         return Mapper.Map<ICollection<CityOfSubjectContract>>(cityOfSubjectRecs.OrderBy(t => t.City));
     }

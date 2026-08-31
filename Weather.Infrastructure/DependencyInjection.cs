@@ -1,9 +1,12 @@
 using AutoMapper;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Weather.Application.Services;
 using Weather.Domain.Entities;
+using Weather.Infrastructure.DataLayer;
 using Weather.Infrastructure.Implementations;
 
 namespace Weather.Infrastructure;
@@ -32,8 +35,16 @@ public static class DependencyInjection
         /// </summary>
         public IServiceCollection AddInfrastructureServices()
         {
+            services.AddHttpClient();
+
+            services.AddDbContext<DataContext>(options =>
+            {
+                options.UseInMemoryDatabase("DataContext")
+                    .ConfigureWarnings(warnings => warnings.Ignore(InMemoryEventId.TransactionIgnoredWarning));
+            });
+            
             services.AddScoped<IWeatherService, WeatherService>();
-            services.AddSingleton<IReadRepository<CityOfSubject>, CityOfSubjectRepository>();
+            services.AddScoped<IRepository<CityOfSubject>, CityOfSubjectRepository>();
 
             return services;
         }

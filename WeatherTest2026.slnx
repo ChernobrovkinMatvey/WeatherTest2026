@@ -5,6 +5,7 @@
   <Folder Name="/Элементы решения/">
     <File Path="README.md" />
   </Folder>
+  <Project Path="Weather.Api/Weather.Api.csproj" />
   <Project Path="Weather.Application/Weather.Application.csproj" />
   <Project Path="Weather.Domain/Weather.Domain.csproj" />
   <Project Path="Weather.Infrastructure/Weather.Infrastructure.csproj" />

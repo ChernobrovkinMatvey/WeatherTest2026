@@ -6,14 +6,16 @@ using Weather.Domain.Entities;
 namespace Weather.Infrastructure.Handlers;
 
 /// <summary>
-/// Возвращает статический список административных центров с координатами <see cref="GetCityOfSubjectQuery"/>
+/// Возвращает административный центр с координатами <see cref="GetCityOfSubjectQuery"/>
 /// </summary>
-public class GetCityOfSubjectHandler(IReadRepository<CityOfSubject> cityOfSubjectRepository) : IRequestHandler<GetCityOfSubjectQuery, ICollection<CityOfSubject>>
+public class GetCityOfSubjectHandler(IRepository<CityOfSubject> cityOfSubjectRepository) : IRequestHandler<GetCityOfSubjectQuery, CityOfSubject?>
 {
-    private readonly IReadRepository<CityOfSubject> _cityOfSubjectRepository = cityOfSubjectRepository;
+    private readonly IRepository<CityOfSubject> _cityOfSubjectRepository = cityOfSubjectRepository;
 
-    public async Task<ICollection<CityOfSubject>> Handle(GetCityOfSubjectQuery request, CancellationToken cancellationToken)
-    {
-        return await _cityOfSubjectRepository.GetAll();
+    public async Task<CityOfSubject?> Handle(GetCityOfSubjectQuery request, CancellationToken cancellationToken)
+    { 
+        var cityOfSubject = await _cityOfSubjectRepository.GetById(request.Id);
+
+        return cityOfSubject;
     }
 }

@@ -1,42 +1,42 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Weather.Infrastructure.DataLayer;
 using Weather.Infrastructure.Implementations;
 
 namespace Weather.UnitTest;
 
-/// <summary>
-/// Тесты для CityOfSubjectRepository
-/// </summary>
 public class CityOfSubjectRepositoryTests
 {
-    /// <summary>
-    /// Проверяет, что GetAll возвращает хотя бы одну запись
-    /// </summary>
+    private readonly CityOfSubjectRepository _repository;
+
+    public CityOfSubjectRepositoryTests()
+    {
+        var options = new DbContextOptionsBuilder<DataContext>()
+            .UseInMemoryDatabase(databaseName: $"TestDb_{Guid.NewGuid()}")
+            .ConfigureWarnings(warnings => warnings.Ignore(InMemoryEventId.TransactionIgnoredWarning))
+            .Options;
+        var dataContext = new DataContext(options);
+        _repository = new CityOfSubjectRepository(dataContext);
+    }
+
     [Fact]
     public async Task GetAll_ShouldReturnEntries()
     {
-        var repository = new CityOfSubjectRepository();
-        var result = await repository.GetAll();
+        var result = await _repository.GetAll();
         Assert.True(result.Count > 0);
     }
 
-    /// <summary>
-    /// Проверяет, что у каждой записи заполнен Id
-    /// </summary>
     [Fact]
     public async Task GetAll_EveryEntry_ShouldHaveNonEmptyId()
     {
-        var repository = new CityOfSubjectRepository();
-        var result = await repository.GetAll();
+        var result = await _repository.GetAll();
         Assert.All(result, entry => Assert.NotEqual(Guid.Empty, entry.Id));
     }
 
-    /// <summary>
-    /// Проверяет, что у каждой записи заполнены Subject, City и координаты
-    /// </summary>
     [Fact]
     public async Task GetAll_EveryEntry_ShouldHaveRequiredFields()
     {
-        var repository = new CityOfSubjectRepository();
-        var result = await repository.GetAll();
+        var result = await _repository.GetAll();
         Assert.All(result, entry =>
         {
             Assert.False(string.IsNullOrWhiteSpace(entry.Subject));

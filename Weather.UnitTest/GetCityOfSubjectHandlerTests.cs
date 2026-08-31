@@ -9,16 +9,16 @@ namespace Weather.UnitTest;
 /// <summary>
 /// Тесты для GetCityOfSubjectHandler с использованием Moq
 /// </summary>
-public class GetCityOfSubjectHandlerTests
+public class GetAllCityOfSubjectHandlerTests
 {
-    private readonly Mock<IReadRepository<CityOfSubject>> _repositoryMock;
+    private readonly Mock<IRepository<CityOfSubject>> _repositoryMock;
 
-    private readonly GetCityOfSubjectHandler _handler;
+    private readonly GetAllCityOfSubjectHandler _handler;
 
-    public GetCityOfSubjectHandlerTests()
+    public GetAllCityOfSubjectHandlerTests()
     {
-        _repositoryMock = new Mock<IReadRepository<CityOfSubject>>();
-        _handler = new GetCityOfSubjectHandler(_repositoryMock.Object);
+        _repositoryMock = new Mock<IRepository<CityOfSubject>>();
+        _handler = new GetAllCityOfSubjectHandler(_repositoryMock.Object);
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ public class GetCityOfSubjectHandlerTests
             .Setup(r => r.GetAll())
             .ReturnsAsync(expectedCities);
 
-        var result = await _handler.Handle(new GetCityOfSubjectQuery(), CancellationToken.None);
+        var result = await _handler.Handle(new GetAllCityOfSubjectQuery(), CancellationToken.None);
 
         Assert.Same(expectedCities, result);
         _repositoryMock.Verify(r => r.GetAll(), Times.Once);

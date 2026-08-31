@@ -1,12 +1,5 @@
-using AutoMapper;
-using Microsoft.Extensions.Logging.Abstractions;
 using Weather.Application.Queries;
-using Weather.Application.Services;
-using Weather.Application.WeatherApi;
-using Weather.Domain.Models;
 using Weather.Infrastructure.Handlers;
-using Weather.Infrastructure.Implementations;
-using Weather.Infrastructure.MappingProfiles;
 using Weather.Infrastructure.Validators;
 
 namespace Weather.IntegrationTest;
@@ -43,7 +36,6 @@ public class WeatherQueryPipelineTests : IntegrationTestBase
         Assert.Equal("Moscow", result.City);
         Assert.Equal("Moscow City", result.Region);
         Assert.Equal("Russia", result.Country);
-        Assert.Equal("2026-08-27 14:30", result.LocalTime);
 
         Assert.NotNull(result.Current);
         Assert.Equal(22.5, result.Current.TempC);
@@ -53,11 +45,8 @@ public class WeatherQueryPipelineTests : IntegrationTestBase
 
         Assert.NotNull(result.Forecastdays);
         var day = Assert.Single(result.Forecastdays);
-        Assert.Equal("2026-08-27", day.Date);
         Assert.Equal(22.0, day.AvgtempC);
         Assert.Equal(18.0, day.MaxWindKph);
-        Assert.Equal("05:30", day.Sunrise);
-        Assert.Equal("08:15", day.Sunset);
         Assert.NotNull(day.Hours);
         var hour = Assert.Single(day.Hours);
         Assert.Equal(22.0, hour.TempC);

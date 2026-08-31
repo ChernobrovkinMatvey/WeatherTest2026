@@ -1,14 +1,17 @@
 using Weather.Application.Services;
 using Weather.Domain.Entities;
+using Weather.Infrastructure.DataLayer;
 
 namespace Weather.Infrastructure.Implementations;
 
 /// <summary>
 /// Репозиторий с городами субъектов Российской Федерации
 /// </summary>
-public class CityOfSubjectRepository : IReadRepository<CityOfSubject>
+public class CityOfSubjectRepository : IRepository<CityOfSubject>
 {
-    private List<CityOfSubject> _cityOfSubjects =
+    private readonly DataContext _dataContext;
+    
+    private readonly List<CityOfSubject> _cityOfSubjects =
     [
         new CityOfSubject { Subject = "Адыгея", City = "Майкоп", Lat = 44.606208, Lon = 40.104053 },
         new CityOfSubject { Subject = "Республика Алтай", City = "Горно-Алтайск", Lat = 51.957775, Lon = 85.963653 },
@@ -101,17 +104,65 @@ public class CityOfSubjectRepository : IReadRepository<CityOfSubject>
         new CityOfSubject { Subject = "Ямало-Ненецкий АО", City = "Салехард", Lat = 66.529866, Lon = 66.614631 }
     ];
 
-    public CityOfSubjectRepository()
+    public CityOfSubjectRepository(DataContext dataContext)
     {
+        _dataContext = dataContext;
+
+        // заполнение таблицы данными (это надо делать в миграции, но UseInMemoryDatabase не позволяет их создавать)
+        using var transaction = _dataContext.Database.BeginTransaction();
         foreach (var cityOfSubject in _cityOfSubjects)
         {
             cityOfSubject.Id = Guid.NewGuid();
+            var entity = _dataContext
+                                        .Set<CityOfSubject>()
+                                        .FirstOrDefault(t => t.Subject == cityOfSubject.Subject && t.City == cityOfSubject.City);
+            if (entity == null)
+                _dataContext.Set<CityOfSubject>().Add(cityOfSubject);
         }
+        var n =_dataContext.SaveChanges();
+        transaction.Commit();
     }
     
     /// <inheritdoc/>
     public async Task<ICollection<CityOfSubject>> GetAll()
     {
-        return _cityOfSubjects;
+        return _dataContext.Set<CityOfSubject>().ToList();
+    }
+
+    /// <inheritdoc/>
+    public async Task<CityOfSubject?> GetById(Guid id)
+    {
+        return await _dataContext.Set<CityOfSubject>().FindAsync(id);
+    }
+
+    /// <inheritdoc/>
+    public async Task Add(CityOfSubject entity)
+    {
+        if (entity.Id == Guid.Empty)
+            entity.Id = Guid.NewGuid();
+        
+        await _dataContext.Set<CityOfSubject>().AddAsync(entity);
+        await _dataContext.SaveChangesAsync();
+    }
+
+    /// <inheritdoc/>
+    public async Task Update(CityOfSubject entity)
+    {
+        var cityOfSubject = await GetById(entity.Id) ?? throw new Exception($"Сущность не найдена по id ({entity.Id})");
+        cityOfSubject.City = entity.City;
+        cityOfSubject.Subject = entity.Subject;
+        cityOfSubject.Lat = entity.Lat;
+        cityOfSubject.Lon = entity.Lon;
+        
+        await _dataContext.SaveChangesAsync();
+    }
+
+    /// <inheritdoc/>
+    public async Task Delete(Guid id)
+    {
+        var entity = await GetById(id) ?? throw new Exception($"Сущность не найдена по id ({id})");
+        
+        _dataContext.Set<CityOfSubject>().Remove(entity);
+        await _dataContext.SaveChangesAsync();
     }
 }

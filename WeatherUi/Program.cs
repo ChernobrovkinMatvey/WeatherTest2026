@@ -16,8 +16,6 @@ public class Program
         builder.Services
             .Configure<WeatherApiOptions>(builder.Configuration.GetSection(WeatherApiOptions.SectionName));
 
-        builder.Services.AddHttpClient();
-
         builder.Services.AddMappingProfiles();
         builder.Services.AddInfrastructureServices();
         builder.Services.AddValidators();

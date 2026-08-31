@@ -4,14 +4,12 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>1591</NoWarn> <!-- Опционально: подавляет предупреждения о missing XML comment -->
     </PropertyGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Weather.Domain\Weather.Domain.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="DTOs\" />
     </ItemGroup>
 
     <ItemGroup>
