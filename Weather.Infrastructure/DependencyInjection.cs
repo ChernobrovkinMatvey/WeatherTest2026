@@ -2,8 +2,10 @@ using AutoMapper;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
+using Scrutor;
 using Weather.Application.Services;
 using Weather.Domain.Entities;
 using Weather.Infrastructure.DataLayer;
@@ -31,17 +33,46 @@ public static class DependencyInjection
         }
 
         /// <summary>
+        /// Регистрация загрузчиков справочников
+        /// </summary>
+        private void RegisterSeeders()
+        { 
+            // var seederTypes = typeof(DependencyInjection).Assembly.GetTypes()
+            //     .Where(t => t is { IsClass: true, IsAbstract: false } &&
+            //                 typeof(ISeeder).IsAssignableFrom(t) &&
+            //                 t.Namespace == "Weather.Infrastructure.Seeders");
+            // foreach (var seederType in seederTypes)
+            //     services.AddScoped(typeof(ISeeder), seederType);
+
+            services.Scan(scan => scan
+                .FromAssemblies(typeof(DependencyInjection).Assembly)
+                .AddClasses(classes => classes.AssignableTo<ISeeder>())
+                .AsImplementedInterfaces()
+                .WithScopedLifetime()); 
+        }
+
+        /// <summary>
         /// Регистрирует сервисы приложения
         /// </summary>
-        public IServiceCollection AddInfrastructureServices()
+        public IServiceCollection AddInfrastructureServices(IConfiguration configuration)
         {
             services.AddHttpClient();
 
             services.AddDbContext<DataContext>(options =>
             {
+                var connectionString = DbConnectionResolver.ResolveConnectionString(configuration);
+
+                if (!string.IsNullOrWhiteSpace(connectionString))
+                {
+                    options.UseNpgsql(connectionString);
+                    return;
+                }
+
                 options.UseInMemoryDatabase("DataContext")
                     .ConfigureWarnings(warnings => warnings.Ignore(InMemoryEventId.TransactionIgnoredWarning));
             });
+
+            services.RegisterSeeders();
             
             services.AddScoped<IWeatherService, WeatherService>();
             services.AddScoped<IRepository<CityOfSubject>, CityOfSubjectRepository>();

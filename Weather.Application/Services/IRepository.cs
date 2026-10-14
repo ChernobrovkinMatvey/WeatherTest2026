@@ -21,15 +21,15 @@ public interface IRepository<T> where T: Entity
     /// <summary>
     /// Добавление сущности
     /// </summary>
-    Task Add(T entity);
+    Task<int> Add(T entity);
     
     /// <summary>
     /// Обновление сущности
     /// </summary>
-    Task Update(T entity);
+    Task<int> Update(T entity);
     
     /// <summary>
     /// Удаление сущности
     /// </summary>
-    Task Delete(Guid id);
+    Task<int> Delete(Guid id);
 }

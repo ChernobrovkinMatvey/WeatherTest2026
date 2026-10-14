@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/Solution Items/">
+    <File Path="docker-compose.cmd" />
     <File Path="docker-compose.yaml" />
   </Folder>
   <Folder Name="/Элементы решения/">

@@ -28,6 +28,11 @@ public class ToContractsMappingProfile : Profile
         CreateMap<CityOfSubject, CityOfSubjectContract>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToString()));
 
-        CreateMap<CityOfSubjectCreateContract, CityOfSubjectCreateDto>();
+        CreateMap<CityOfSubjectCreateContract, CityOfSubjectPushDto>();
+        
+        CreateMap<CityOfSubjectContract, CityOfSubjectPushDto>();
+
+        CreateMap<CityOfSubjectPushDto, CityOfSubject>()
+            .ForMember(d => d.Id, opt => opt.Ignore());
     }
 }

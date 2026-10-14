@@ -1,8 +1,54 @@
-﻿services:
+﻿version: "3.9"
+
+services:
   weatherui:
+    container_name: weatherui_container
     image: weatherui
     build:
       context: .
       dockerfile: WeatherUi/Dockerfile
     ports:
       - "5080:8080"
+      
+  weatherapi:
+    container_name: weatherapi_container
+    image: weatherapi
+    build:
+      context: .
+      dockerfile: Weather.Api/Dockerfile
+    ports:
+      - "6080:8080"
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ASPNETCORE_ENVIRONMENT: Development # работающий /swagger в контейнере
+      DATABASE_URL: Host=postgresql;Port=5432;Database=app;Username=app_user;Password=secret
+    depends_on:
+      postgresql:
+        condition: service_healthy
+        
+  postgresql:
+    container_name: postgres_container
+    image: postgres:18.6-alpine3.24
+    environment:
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: app
+      PGDATA: /var/lib/postgresql
+    ports:
+      - "55432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB" ]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+          
+          
+volumes:
+  pgdata:
+    driver: local

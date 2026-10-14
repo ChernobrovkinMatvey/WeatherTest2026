@@ -9,5 +9,5 @@ namespace Weather.Application.Queries;
 /// </summary>
 public class CreateCityOfSubjectCommand : IRequest<CityOfSubject>
 {
-    public CityOfSubjectCreateDto CreateDto { get; set; }
+    public CityOfSubjectPushDto CreateDto { get; set; }
 }

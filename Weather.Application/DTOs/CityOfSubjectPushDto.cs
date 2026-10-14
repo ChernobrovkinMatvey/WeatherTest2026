@@ -1,9 +1,9 @@
 namespace Weather.Application.DTOs;
 
 /// <summary>
-/// Dto создания города субъекта Российской Федерации
+/// Dto создания/изменения города субъекта Российской Федерации
 /// </summary>
-public class CityOfSubjectCreateDto
+public class CityOfSubjectPushDto
 {
     /// <summary>
     /// Субъект РФ
